@@ -4,9 +4,8 @@ IT Law Chatbot là một trợ lý ảo hỗ trợ tư vấn pháp luật chuyê
 
 Dự án dùng mô hình LLM từ Google (Gemini) để sinh đáp án phân tích, dựa trên kho văn bản luật trong cơ sở dữ liệu mạng kết nối (MySQL), kết hợp cùng Vector Embeddings (`all-MiniLM-L6-v2` thông qua `sentence-transformers`).
 
----
 
-## 🛠 Yêu cầu hệ thống
+## Yêu cầu hệ thống
 
 - **Python 3.10** hoặc mới hơn.
 - **XAMPP** (hoặc MySQL Server tương đương).
@@ -14,7 +13,7 @@ Dự án dùng mô hình LLM từ Google (Gemini) để sinh đáp án phân tí
 
 ---
 
-## 🚀 Hướng dẫn cài đặt và chạy chi tiết
+## Hướng dẫn cài đặt và chạy chi tiết
 
 ### Bước 1: Khởi động cơ sở dữ liệu MySQL
 
@@ -74,11 +73,11 @@ Tại Terminal đang chạy môi trường ảo, bạn gõ lệnh:
 python database/seed_data.py
 ```
 
-> ⚠️ **Lưu ý:** Quá trình nạp và phân tích sinh ra số lượng lớn Embeddings (hơn 9.000 records) nên sẽ tiêu tốn từ vài phút đến vài chục phút tùy hiệu năng máy của bạn (CPU/GPU). Vui lòng kiên nhẫn.
+> **Lưu ý:** Quá trình nạp và phân tích sinh ra số lượng lớn Embeddings (hơn 9.000 records) nên sẽ tiêu tốn từ vài phút đến vài chục phút tùy hiệu năng máy của bạn (CPU/GPU). Vui lòng kiên nhẫn.
 
 ### Bước 5: Chạy máy chủ Chatbot
 
-Sau khi thấy thông báo việc Seed Data hoàn tất (✅ *Seed data completed!*), tiến hành khởi động server Flask:
+Sau khi thấy thông báo việc Seed Data hoàn tất ( *Seed data completed!*), tiến hành khởi động server Flask:
 
 ```bash
 python app.py
@@ -89,6 +88,6 @@ Khi server hoạt động thành công, Terminal sẽ hiển thị: `Server runn
 ### Bước 6: Trải nghiệm giao diện
 
 Mở trình duyệt bất kỳ (Google Chrome, Edge, v.v...) và truy cập đường dẫn: 
-👉 **[http://localhost:5000](http://localhost:5000)**
+**[http://localhost:5000](http://localhost:5000)**
 
 Chỉ cần gõ câu hỏi vào vùng trò chuyện (Ví dụ: *"Các hành vi bị nghiêm cấm trong luật CNTT là gì?"*), Chatbot sẽ truy xuất tài liệu và trả về câu trả lời có trích xuất chi tiết theo Đồ thị tri thức/Vector!
