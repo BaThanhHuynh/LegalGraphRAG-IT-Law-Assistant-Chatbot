@@ -15,7 +15,7 @@ Xử lý đặc biệt:
   - Sau split: lọc bỏ chunk rác (< 5 ký tự hoặc là số đơn thuần)
   - Tiêu đề điều tách rời (do RE_KHOAN) → merge vào khoản 1
 
-DE: Lục Sỹ Minh Hiền | Project: Chatbot CNTT VN
+
 
 Cách dùng:
     python smart_chunker.py --input data/law_data_output.xlsx --output data/law_chunks --format both

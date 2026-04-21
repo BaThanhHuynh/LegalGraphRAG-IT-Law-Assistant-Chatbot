@@ -90,4 +90,4 @@ Khi server hoạt động thành công, Terminal sẽ hiển thị: `Server runn
 Mở trình duyệt bất kỳ (Google Chrome, Edge, v.v...) và truy cập đường dẫn: 
 **[http://localhost:5000](http://localhost:5000)**
 
-Chỉ cần gõ câu hỏi vào vùng trò chuyện (Ví dụ: *"Các hành vi bị nghiêm cấm trong luật CNTT là gì?"*), Chatbot sẽ truy xuất tài liệu và trả về câu trả lời có trích xuất chi tiết theo Đồ thị tri thức/Vector!
+Chỉ cần gõ câu hỏi vào vùng trò chuyện (Ví dụ: *"Các hành vi bị nghiêm cấm trong luật CNTT là gì?"*), Chatbot sẽ truy xuất tài liệu và trả về câu trả lời có trích xuất chi tiết theo Đồ thị tri thức/Vector

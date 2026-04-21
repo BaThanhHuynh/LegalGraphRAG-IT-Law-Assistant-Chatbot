@@ -5,7 +5,6 @@ Crawl dữ liệu từ folder chứa file DOCX/PDF luật và nghị định,
 parse ra cấu trúc: tên văn bản → chương → mục → điều → nội dung,
 sau đó xuất ra file Excel với schema đầy đủ phục vụ pipeline RAG.
 
-DE: Lục Sỹ Minh Hiền  |  Project: Chatbot CNTT VN
 Stack: python-docx + openpyxl + re
 
 Cách dùng:

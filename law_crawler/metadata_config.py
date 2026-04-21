@@ -1,9 +1,3 @@
-# ============================================================
-# metadata_config.py
-# Cấu hình metadata cho từng văn bản pháp luật
-# DE: Lục Sỹ Minh Hiền  |  Project: Chatbot CNTT VN
-# ============================================================
-
 # Mapping: tên file (không có extension) -> metadata đầy đủ
 DOCUMENT_METADATA = {
 
