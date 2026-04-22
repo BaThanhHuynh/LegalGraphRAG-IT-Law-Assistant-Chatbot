@@ -1,117 +1,180 @@
-# IT Law Chatbot - Tư vấn Luật Công nghệ thông tin (GraphRAG Edition)
+# IT Law Chatbot – GraphRAG IT Law Advisory
 
-IT Law Chatbot là một trợ lý ảo hỗ trợ tư vấn pháp luật chuyên sâu về lĩnh vực Công nghệ thông tin (Việt Nam). Dự án sử dụng kiến trúc **GraphRAG** (Retrieval-Augmented Generation kết hợp Knowledge Graph) để tăng cường độ chính xác cho câu trả lời.
+## Giới thiệu
 
-Hệ thống kết hợp sức mạnh của **Vector Search** (truy xuất đoạn văn bản liên quan) và **Knowledge Graph** (truy xuất mối quan hệ giữa các điều luật) để cung cấp câu trả lời có tính hệ thống và đầy đủ dẫn chứng.
+IT Law Chatbot là một hệ thống trợ lý pháp lý được xây dựng nhằm hỗ trợ tra cứu và tư vấn **Luật Công nghệ Thông tin tại Việt Nam**. Hệ thống được thiết kế với mục tiêu cung cấp câu trả lời có căn cứ rõ ràng, bám sát điều luật và hạn chế tối đa việc suy đoán ngoài dữ liệu.
 
----
-
-## Kiến trúc GraphRAG
-
-Hệ thống GraphRAG trong dự án này bao gồm:
-
-### 1. Dữ liệu Tri thức (Knowledge Graph)
-Được lưu trữ trong **Neo4j**, bao gồm các thực thể pháp lý và mối liên kết giữa chúng:
-- **Thực thể (Nodes):**
-    - `VAN_BAN`: Các luật, nghị định, thông tư (v dụ: Luật CNTT 2006).
-    - `CHUONG`: Các chương mục lớn trong văn bản pháp luật.
-    - `DIEU_LUAT`: Các điều luật cụ thể - đơn vị tra cứu chính.
-    - `KHAI_NIEM`: Các định nghĩa, khái niệm pháp lý quan trọng.
-    - `HANH_VI`: Các hành vi bị nghiêm cấm được quy định cụ thể.
-    - `CHU_THE`: Đối tượng áp dụng (Cá nhân, Tổ chức, Doanh nghiệp...).
-- **Quan hệ (Edges):**
-    - `THUOC`: Phân cấp Điều -> Chương -> Văn bản.
-    - `THAM_CHIEU`: Khi một điều luật dẫn chiếu đến một điều luật hoặc văn bản khác.
-    - `NGHIEM_CAM`: Liên kết giữa điều luật và các hành vi không được phép.
-    - `DINH_NGHIA`: Liên kết giữa điều luật và khái niệm nó giải thích.
-    - `AP_DUNG`: Đối tượng chịu sự điều chỉnh của điều luật.
-
-### 2. Truy xuất Vector (Vector RAG)
-Sử dụng **MySQL** lưu trữ nội dung chi tiết và Embeddings (`all-MiniLM-L6-v2`). Giúp tìm kiếm các đoạn văn bản có nội dung tương đồng về mặt ngữ nghĩa với câu hỏi người dùng.
-
-### 3. Mô hình ngôn ngữ (LLM)
-Sử dụng **Google Gemini (gemini-2.5-flash)** để tổng hợp thông tin từ cả Vector Search và Graph Search nhằm tạo ra câu trả lời cuối cùng chính xác, có cấu trúc.
+Điểm cốt lõi của dự án là việc áp dụng kiến trúc **GraphRAG** – kết hợp giữa truy xuất ngữ nghĩa (Vector Search) và đồ thị tri thức (Knowledge Graph). Cách tiếp cận này giúp hệ thống không chỉ “tìm đúng đoạn luật”, mà còn “hiểu mối quan hệ giữa các điều luật”, từ đó cải thiện đáng kể độ chính xác và tính nhất quán của câu trả lời.
 
 ---
 
-## Yêu cầu hệ thống
+## Kiến trúc tổng thể
 
-- **Python 3.10+**
-- **Neo4j Desktop** (Bản cài đặt cho Windows)
-- **XAMPP** (MySQL 3306)
+Hệ thống gồm ba thành phần chính, phối hợp với nhau trong quá trình xử lý truy vấn:
 
----
+### Knowledge Graph (Neo4j)
 
-## Hướng dẫn cài đặt và chạy chi tiết
+Đây là lớp biểu diễn tri thức có cấu trúc, mô hình hóa luật dưới dạng đồ thị.
 
-### Bước 1: Khởi động cơ sở dữ liệu
+**Các thực thể chính:**
+- `VAN_BAN`: Văn bản pháp luật (Luật, Nghị định, Thông tư)
+- `CHUONG`: Các chương trong văn bản
+- `DIEU_LUAT`: Đơn vị tra cứu chính
+- `KHAI_NIEM`: Định nghĩa pháp lý
+- `HANH_VI`: Hành vi bị điều chỉnh hoặc cấm
+- `CHU_THE`: Đối tượng áp dụng
 
-1. **MySQL:** Mở XAMPP và Start module **MySQL**.
-2. **Neo4j Desktop:** 
-   - Tải và cài đặt [Neo4j Desktop](https://neo4j.com/download/).
-   - Tạo một Project mới, chọn **Add** -> **Local DBMS**.
-   - Đặt tên DBMS (vD: `it-law-db`) và đặt mật khẩu (khuyến nghị dùng: `password` để khớp với `.env`).
-   - Nhấn **Start** để khởi chạy database. 
-   - *Đảm bảo trạng thái là "Active" trước khi chạy các script Python.*
+**Các quan hệ:**
+- `THUOC`: Quan hệ phân cấp (Điều → Chương → Văn bản)
+- `THAM_CHIEU`: Dẫn chiếu giữa các điều luật
+- `NGHIEM_CAM`: Hành vi bị cấm
+- `DINH_NGHIA`: Liên kết định nghĩa
+- `AP_DUNG`: Đối tượng áp dụng
 
-### Bước 2: Thiết lập môi trường Python
-
-```bash
-# Tạo và kích hoạt môi trường ảo
-python -m venv .venv
-.\.venv\Scripts\activate  # Windows
-
-# Cài đặt thư viện
-pip install -r requirements.txt
-```
-
-### Bước 3: Cấu hình `.env`
-
-Tạo file `.env` từ nội dung dưới đây:
-```env
-GEMINI_API_KEY=điền_api_key_cua_ban
-
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=
-MYSQL_DATABASE=it_law_chatbot
-
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=password
-```
-
-### Bước 4: Nạp dữ liệu (Data Pipeline)
-
-Quy trình nạp dữ liệu bao gồm 2 công đoạn:
-
-1. **Nạp dữ liệu vào MySQL & Sinh Vector:**
-   ```bash
-   python database/seed_data.py
-   ```
-   *(Quá trình này tạo bảng, lưu trữ văn bản luật và tạo embeddings)*
-
-2. **Đồng bộ sang Neo4j (Xây dựng Graph):**
-   ```bash
-   python scripts/migrate_to_neo4j.py
-   ```
-   *(Script này sẽ đọc các quan hệ từ MySQL và chuyển đổi thành Nodes/Edges trong Neo4j)*
-
-### Bước 5: Chạy máy chủ
-
-```bash
-python app.py
-```
-Truy cập: **[http://localhost:5000](http://localhost:5000)**
+Vai trò của Knowledge Graph là giúp hệ thống:
+- Truy vết logic pháp lý
+- Mở rộng ngữ cảnh truy vấn
+- Hỗ trợ suy luận đa bước giữa các điều luật
 
 ---
 
-## Cách sử dụng
+### Vector Retrieval (MySQL + Embedding)
 
-1. **Đặt câu hỏi:** Nhập các vấn đề pháp lý liên quan đến CNTT (Ví dụ: "Hành vi phá hoại hệ thống thông tin bị xử lý thế nào?").
-2. **Kết quả Hybrid:** 
-   - Hệ thống sẽ dùng Vector Search để tìm các điều luật liên quan trực tiếp.
-   - Hệ thống dùng Knowledge Graph để tìm các khái niệm liên quan, các điều luật tham chiếu hoặc văn bản gốc.
-3. **Phân tích Đồ thị:** Bạn có thể xem biểu đồ trực quan các mối liên hệ giữa các điều luật ngay trên giao diện chat.
-4. **Trích dẫn:** Mọi câu trả lời đều có trích dẫn nguồn luật cụ thể để đảm bảo tính pháp lý.
+Thành phần này đảm nhiệm việc tìm kiếm ngữ nghĩa.
+
+- Dữ liệu văn bản luật được chia nhỏ theo **Điều/Khoản**
+- Sử dụng embedding model: `all-MiniLM-L6-v2`
+- Lưu trữ trong MySQL (XAMPP)
+
+Vai trò:
+- Tìm các đoạn văn bản có nội dung liên quan
+- Cung cấp context ban đầu cho mô hình ngôn ngữ
+- Xử lý các truy vấn không khớp chính xác từ khóa
+
+---
+
+### Mô hình ngôn ngữ (LLM)
+
+Hệ thống sử dụng **Gemini 2.5 Flash** để tổng hợp thông tin và sinh câu trả lời.
+
+**Đầu vào:**
+- Context từ Vector Search
+- Thông tin quan hệ từ Knowledge Graph
+
+**Đầu ra:**
+- Câu trả lời có cấu trúc
+- Trích dẫn điều luật cụ thể
+- Lập luận dựa trên dữ liệu truy xuất
+
+---
+
+## Cách hệ thống hoạt động (GraphRAG)
+
+Quy trình xử lý một câu hỏi diễn ra theo các bước:
+
+1. **Phân tích truy vấn**
+   - Xác định hành vi, chủ thể, loại văn bản liên quan
+
+2. **Truy xuất vector**
+   - Tìm các đoạn luật có độ tương đồng cao
+
+3. **Truy vấn đồ thị**
+   - Mở rộng thông tin qua các quan hệ như:
+     - Điều luật liên quan
+     - Hành vi bị cấm
+     - Văn bản nguồn
+
+4. **Hợp nhất ngữ cảnh**
+   - Loại bỏ trùng lặp
+   - Giữ lại thông tin có giá trị cao
+
+5. **Sinh câu trả lời**
+   - Dựa hoàn toàn vào dữ liệu truy xuất
+   - Kèm theo trích dẫn pháp lý
+
+---
+
+## Pipeline dữ liệu
+
+Hệ thống có pipeline xử lý dữ liệu gồm hai phần chính:
+
+### 1. Xử lý và lưu trữ văn bản
+
+- Thu thập văn bản luật
+- Làm sạch và chuẩn hóa dữ liệu
+- Chia đoạn theo cấu trúc (Điều/Khoản)
+- Sinh embedding
+- Lưu vào MySQL
+
+### 2. Xây dựng Knowledge Graph
+
+- Trích xuất thực thể (NER)
+- Trích xuất quan hệ (Relation Extraction)
+- Chuyển dữ liệu sang Neo4j
+- Tạo nodes và relationships theo schema pháp lý
+
+---
+
+## Thiết kế lưu trữ
+
+### MySQL
+Dùng để lưu:
+- Nội dung văn bản luật
+- Embedding vector
+- Metadata (điều, khoản, văn bản…)
+
+### Neo4j
+Dùng để lưu:
+- Quan hệ giữa các thành phần pháp luật
+- Cấu trúc phân cấp và dẫn chiếu
+
+---
+
+## Điểm nổi bật
+
+- Kết hợp **Vector Search và Knowledge Graph**
+- Tôn trọng cấu trúc pháp lý (Điều/Khoản)
+- Câu trả lời có **trích dẫn rõ ràng**
+- Giảm thiểu hallucination
+- Dễ mở rộng thêm dữ liệu và luật mới
+
+---
+
+## Công nghệ sử dụng
+
+| Thành phần | Công nghệ |
+|----------|----------|
+| Backend | Python (Flask) |
+| LLM | Gemini 2.5 Flash |
+| Embedding | sentence-transformers |
+| Database | MySQL (XAMPP) |
+| Graph DB | Neo4j |
+| Pipeline | Python scripts |
+
+---
+
+## Phạm vi
+
+Hệ thống hiện tập trung vào:
+- Luật Công nghệ thông tin
+- Luật An ninh mạng
+- Các nghị định, thông tư liên quan
+
+---
+
+## Hạn chế
+
+- Phụ thuộc vào dữ liệu đầu vào
+- Cần cập nhật khi có thay đổi pháp luật
+- Độ chính xác phụ thuộc vào mức độ đầy đủ của Knowledge Graph
+
+---
+
+## Định hướng phát triển
+
+- Mở rộng sang các lĩnh vực luật khác
+- Tích hợp mô hình ngôn ngữ chuyên ngành pháp lý
+- Tối ưu truy vấn đồ thị (multi-hop reasoning)
+- Xây dựng hệ thống đánh giá tự động
+
+---
