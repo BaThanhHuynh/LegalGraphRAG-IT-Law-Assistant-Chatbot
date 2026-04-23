@@ -3,13 +3,14 @@ FastAPI app entry point for IT Law Chatbot.
 """
 import warnings
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
-from config import Config
-from routes.chat import chat_router
+from app.core.config import Config
+from app.core.logger import logger
+from app.api.routes.chat import chat_router
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -30,6 +31,15 @@ def create_app():
         allow_headers=["*"],
     )
 
+    # Global Exception Handler
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        logger.error(f"Unhandled error: {exc}", exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "detail": "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau."},
+        )
+
     # Include routers
     app.include_router(chat_router)
 
@@ -49,7 +59,7 @@ if __name__ == "__main__":
     print(f"{'='*60}\n")
 
     uvicorn.run(
-        "app:app",
+        "app.main:app",
         host="0.0.0.0",
         port=Config.API_PORT,
         reload=Config.API_DEBUG

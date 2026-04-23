@@ -11,6 +11,9 @@ __pycache__/
 *.jsonl
 law_crawler/data/
 *.txt
+data/
+logs/
+database/
 
 # IDE
 .vscode/

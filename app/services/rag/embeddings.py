@@ -1,6 +1,6 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from config import Config
+from app.core.config import Config
 
 _model = None
 

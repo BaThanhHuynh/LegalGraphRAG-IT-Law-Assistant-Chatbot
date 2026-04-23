@@ -2,8 +2,8 @@
 Knowledge Graph engine for hybrid search (vector + graph traversal).
 Uses LangChain Neo4jGraph and Cypher queries.
 """
-from config import Config
-from rag.retriever import vector_search
+from app.core.config import Config
+from app.services.rag.retriever import vector_search
 from langchain_neo4j import Neo4jGraph
 from neo4j import GraphDatabase
 
@@ -20,7 +20,8 @@ class KnowledgeGraph:
                 url=Config.NEO4J_URI,
                 username=Config.NEO4J_USERNAME,
                 password=Config.NEO4J_PASSWORD,
-                enhanced_schema=False
+                enhanced_schema=False,
+                refresh_schema=False
             )
         return self._graph
 

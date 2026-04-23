@@ -8,20 +8,12 @@ class Config:
     # Gemini API
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-    # MySQL (XAMPP)
-    MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-    MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
-    MYSQL_USER = os.getenv("MYSQL_USER", "root")
-    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-    MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "it_law_chatbot")
+    # Qdrant Database
+    QDRANT_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "qdrant_db")
+    QDRANT_COLLECTION = "it_law_chunks"
 
-    DB_CONFIG = {
-        "host": MYSQL_HOST,
-        "port": MYSQL_PORT,
-        "user": MYSQL_USER,
-        "password": MYSQL_PASSWORD,
-        "database": MYSQL_DATABASE,
-    }
+    # Chat History (JSON)
+    CHAT_HISTORY_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "chat_history.json")
 
     # Neo4j
     NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
@@ -33,7 +25,7 @@ class Config:
     API_DEBUG = os.getenv("API_DEBUG", "true").lower() == "true"
 
     # Embedding model
-    EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     EMBEDDING_DIM = 384
 
     # RAG settings

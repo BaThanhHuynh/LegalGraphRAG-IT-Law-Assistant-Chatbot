@@ -1,15 +1,14 @@
-"""
-Chatbot engine: orchestrates RAG retrieval, graph context, and LLM generation.
-"""
 import json
 import uuid
+import os
+from datetime import datetime
 import google.generativeai as genai
 
-from config import Config
-from db import execute_query, fetch_all, fetch_one
-from rag.retriever import get_context_from_results
-from graphrag.knowledge_graph import hybrid_search
-from chatbot.prompts import SYSTEM_PROMPT, RAG_PROMPT_TEMPLATE, TITLE_PROMPT
+from app.core.config import Config
+from app.core.logger import logger
+from app.services.rag.retriever import get_context_from_results
+from app.services.graphrag.knowledge_graph import hybrid_search
+from app.services.chatbot.prompts import SYSTEM_PROMPT, RAG_PROMPT_TEMPLATE, TITLE_PROMPT
 
 # Configure Gemini
 _model = None
@@ -19,9 +18,24 @@ def get_llm():
     global _model
     if _model is None:
         genai.configure(api_key=Config.GEMINI_API_KEY)
-        _model = genai.GenerativeModel("gemini-2.5-flash")
-        print("[LLM] Gemini model initialized.")
+        _model = genai.GenerativeModel("gemini-2.0-flash")
+        logger.info("[LLM] Gemini model initialized.")
     return _model
+
+
+def _load_history():
+    if not os.path.exists(Config.CHAT_HISTORY_PATH):
+        return {"conversations": {}, "messages": []}
+    with open(Config.CHAT_HISTORY_PATH, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {"conversations": {}, "messages": []}
+
+def _save_history(data):
+    os.makedirs(os.path.dirname(Config.CHAT_HISTORY_PATH), exist_ok=True)
+    with open(Config.CHAT_HISTORY_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def generate_response(query: str, conversation_id: str = None) -> dict:
@@ -47,7 +61,7 @@ def generate_response(query: str, conversation_id: str = None) -> dict:
         graph_context = search_results.get("graph_context", "Không có thông tin từ Knowledge Graph.")
         graph_data = search_results.get("graph_data", {"nodes": [], "edges": []})
     except Exception as e:
-        print(f"[Error] Search failed: {e}")
+        logger.error(f"[Error] Search failed: {e}")
         rag_context = "Không thể truy xuất dữ liệu."
         graph_context = ""
         graph_data = {"nodes": [], "edges": []}
@@ -69,17 +83,22 @@ def generate_response(query: str, conversation_id: str = None) -> dict:
             "parts": [msg["content"]],
         })
 
-    # 6. Call Gemini API directly
+    # 6. Generate Response using Gemini API
     try:
-        model = get_llm()
-        chat = model.start_chat(history=chat_history)
-        response = chat.send_message(
-            f"{SYSTEM_PROMPT}\n\n{prompt}",
-        )
-        answer = response.text
+        # Check for MOCK mode
+        if query.strip().lower().startswith("/mock"):
+            logger.info("MOCK mode activated. Bypassing Gemini API.")
+            answer = "Dữ liệu tìm thấy từ CSDL (Mock Mode):\n\n" + rag_context
+        else:
+            model = get_llm()
+            chat = model.start_chat(history=chat_history)
+            response = chat.send_message(
+                f"{SYSTEM_PROMPT}\n\n{prompt}",
+            )
+            answer = response.text
     except Exception as e:
-        print(f"[Error] LLM generation failed: {e}")
-        answer = f"Xin lỗi, đã xảy ra lỗi khi xử lý câu hỏi. Vui lòng thử lại. (Lỗi: {str(e)})"
+        logger.error(f"[Error] LLM generation failed: {e}")
+        answer = f"Hệ thống đã truy xuất được dữ liệu nhưng API Gemini bị lỗi (có thể hết Quota). Đây là dữ liệu gốc:\n\n{rag_context}"
 
     # 7. Build sources list
     sources = []
@@ -117,40 +136,48 @@ def create_conversation(first_query: str = "") -> str:
         except Exception:
             title = first_query[:50] + "..." if len(first_query) > 50 else first_query
 
-    execute_query(
-        "INSERT INTO conversations (id, title) VALUES (%s, %s)",
-        (conv_id, title),
-    )
+    data = _load_history()
+    now = datetime.now().isoformat()
+    data["conversations"][conv_id] = {
+        "id": conv_id,
+        "title": title,
+        "created_at": now,
+        "updated_at": now
+    }
+    _save_history(data)
     return conv_id
 
 
 def save_message(conversation_id: str, role: str, content: str, sources: list = None):
     """Save a message to the conversation history."""
-    execute_query(
-        "INSERT INTO messages (conversation_id, role, content, sources) VALUES (%s, %s, %s, %s)",
-        (conversation_id, role, content, json.dumps(sources, ensure_ascii=False) if sources else None),
-    )
-    # Update conversation timestamp
-    execute_query(
-        "UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
-        (conversation_id,),
-    )
+    data = _load_history()
+    now = datetime.now().isoformat()
+    
+    data["messages"].append({
+        "conversation_id": conversation_id,
+        "role": role,
+        "content": content,
+        "sources": sources,
+        "created_at": now
+    })
+    
+    if conversation_id in data["conversations"]:
+        data["conversations"][conversation_id]["updated_at"] = now
+        
+    _save_history(data)
 
 
 def get_conversation_history(conversation_id: str, limit: int = 20) -> list:
     """Get conversation messages."""
-    return fetch_all(
-        """SELECT role, content, sources, created_at
-           FROM messages
-           WHERE conversation_id = %s
-           ORDER BY created_at ASC
-           LIMIT %s""",
-        (conversation_id, limit),
-    )
+    data = _load_history()
+    msgs = [m for m in data["messages"] if m["conversation_id"] == conversation_id]
+    msgs.sort(key=lambda x: x["created_at"])
+    return msgs[-limit:] if limit else msgs
 
 
 def get_all_conversations() -> list:
     """Get all conversations sorted by recent."""
-    return fetch_all(
-        "SELECT id, title, created_at, updated_at FROM conversations ORDER BY updated_at DESC"
-    )
+    data = _load_history()
+    convs = list(data["conversations"].values())
+    convs.sort(key=lambda x: x["updated_at"], reverse=True)
+    return convs

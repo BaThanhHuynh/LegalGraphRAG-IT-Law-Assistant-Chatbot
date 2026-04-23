@@ -1,54 +1,21 @@
-"""API routes for the IT Law Chatbot."""
 import json
-from typing import Optional, List, Dict, Any
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
-from chatbot.engine import (
+
+from app.api.schemas import (
+    ChatRequest, ChatResponse, ConversationListResponse,
+    NewConversationResponse, HistoryResponse, KGResponse
+)
+from app.core.logger import logger
+from app.services.chatbot.engine import (
     generate_response,
     create_conversation,
     get_conversation_history,
     get_all_conversations,
 )
-from graphrag.knowledge_graph import get_knowledge_graph
+from app.services.graphrag.knowledge_graph import get_knowledge_graph
 
 chat_router = APIRouter(prefix="/api")
-
-
-class ChatRequest(BaseModel):
-    message: str
-    conversation_id: Optional[str] = None
-
-
-class ChatResponseData(BaseModel):
-    conversation_id: str
-    answer: str
-    sources: List[Dict[str, Any]]
-    graph_data: Dict[str, Any]
-
-
-class ChatResponse(BaseModel):
-    success: bool
-    data: ChatResponseData
-
-
-class ConversationListResponse(BaseModel):
-    success: bool
-    data: List[Dict[str, Any]]
-
-
-class NewConversationResponse(BaseModel):
-    success: bool
-    data: Dict[str, str]
-
-
-class HistoryResponse(BaseModel):
-    success: bool
-    data: List[Dict[str, Any]]
-
-
-class KGResponse(BaseModel):
-    success: bool
-    data: Dict[str, Any]
 
 
 @chat_router.post("/chat", response_model=ChatResponse)
