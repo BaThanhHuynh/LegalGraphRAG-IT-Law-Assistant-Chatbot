@@ -1,180 +1,79 @@
-# IT Law Chatbot – GraphRAG IT Law Advisory
+# ⚖️ IT Law Chatbot - Trợ lý pháp lý thông minh
 
-## Giới thiệu
+## 1. 📖 Tên và mô tả
+**IT Law Chatbot** là một hệ thống trợ lý ảo chuyên tư vấn pháp lý về lĩnh vực Công nghệ thông tin tại Việt Nam. Bằng cách ứng dụng kiến trúc tiên tiến **GraphRAG** (kết hợp Đồ thị tri thức - Knowledge Graph và Tìm kiếm Vector), chatbot có khả năng cung cấp các câu trả lời chính xác, bám sát văn bản pháp luật, đồng thời luôn đi kèm trích dẫn rõ ràng, minh bạch.
 
-IT Law Chatbot là một hệ thống trợ lý pháp lý được xây dựng nhằm hỗ trợ tra cứu và tư vấn **Luật Công nghệ Thông tin tại Việt Nam**. Hệ thống được thiết kế với mục tiêu cung cấp câu trả lời có căn cứ rõ ràng, bám sát điều luật và hạn chế tối đa việc suy đoán ngoài dữ liệu.
+## 2. ✨ Tính năng chính
+- 🔍 **Tra cứu thông minh**: Hiểu ngôn ngữ tự nhiên và truy xuất cực nhanh các điều khoản luật liên quan.
+- 🧠 **Suy luận chuyên sâu (GraphRAG)**: Phân tích được các mối liên hệ phức tạp giữa văn bản luật, chương, điều khoản, hành vi và chủ thể.
+- 💬 **Trả lời tự nhiên, logic**: Tích hợp mô hình AI mạnh mẽ (Gemini 2.5 Flash) giúp phản hồi trôi chảy, dễ hiểu.
+- 📑 **Trích dẫn nguồn uy tín**: Không tự bịa thông tin, luôn cung cấp căn cứ pháp lý để người dùng đối chiếu.
 
-Điểm cốt lõi của dự án là việc áp dụng kiến trúc **GraphRAG** – kết hợp giữa truy xuất ngữ nghĩa (Vector Search) và đồ thị tri thức (Knowledge Graph). Cách tiếp cận này giúp hệ thống không chỉ “tìm đúng đoạn luật”, mà còn “hiểu mối quan hệ giữa các điều luật”, từ đó cải thiện đáng kể độ chính xác và tính nhất quán của câu trả lời.
+## 3. 📸 Ảnh demo
+*(Hãy cập nhật hình ảnh thực tế của ứng dụng)*
 
----
+![Giao diện IT Law Chatbot](https://via.placeholder.com/800x450.png?text=IT+Law+Chatbot+Demo)
 
-## Kiến trúc tổng thể
+## 4. ⚙️ Hướng dẫn cài đặt
 
-Hệ thống gồm ba thành phần chính, phối hợp với nhau trong quá trình xử lý truy vấn:
+**Yêu cầu hệ thống:**
+- Python 3.9 trở lên
+- Neo4j Database
 
-### Knowledge Graph (Neo4j)
+**Các bước cài đặt:**
 
-Đây là lớp biểu diễn tri thức có cấu trúc, mô hình hóa luật dưới dạng đồ thị.
+1. **Clone mã nguồn:**
+   ```bash
+   git clone https://github.com/BaThanhHuynh/IT-Law-Chatbot.git
+   cd IT-Law-Chatbot
+   ```
 
-**Các thực thể chính:**
-- `VAN_BAN`: Văn bản pháp luật (Luật, Nghị định, Thông tư)
-- `CHUONG`: Các chương trong văn bản
-- `DIEU_LUAT`: Đơn vị tra cứu chính
-- `KHAI_NIEM`: Định nghĩa pháp lý
-- `HANH_VI`: Hành vi bị điều chỉnh hoặc cấm
-- `CHU_THE`: Đối tượng áp dụng
+2. **Thiết lập môi trường ảo và cài đặt thư viện:**
+   ```bash
+   python -m venv venv
+   # Kích hoạt trên Windows:
+   venv\Scripts\activate
+   # Kích hoạt trên Linux/Mac:
+   source venv/bin/activate
+   
+   pip install -r requirements.txt
+   ```
 
-**Các quan hệ:**
-- `THUOC`: Quan hệ phân cấp (Điều → Chương → Văn bản)
-- `THAM_CHIEU`: Dẫn chiếu giữa các điều luật
-- `NGHIEM_CAM`: Hành vi bị cấm
-- `DINH_NGHIA`: Liên kết định nghĩa
-- `AP_DUNG`: Đối tượng áp dụng
+3. **Cấu hình môi trường:**
+   Tạo file `.env` ở thư mục gốc và cung cấp các thông tin cần thiết:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key
+   NEO4J_URI=bolt://localhost:7687
+   NEO4J_USER=neo4j
+   NEO4J_PASSWORD=your_password
+   API_PORT=8000
+   ```
 
-Vai trò của Knowledge Graph là giúp hệ thống:
-- Truy vết logic pháp lý
-- Mở rộng ngữ cảnh truy vấn
-- Hỗ trợ suy luận đa bước giữa các điều luật
+## 5. 🚀 Cách sử dụng
 
----
+1. **Khởi chạy máy chủ FastAPI:**
+   ```bash
+   python -m app.main
+   ```
+   *(Hoặc chạy qua uvicorn: `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`)*
 
-### Vector Retrieval (MySQL + Embedding)
+2. **Truy cập ứng dụng:**
+   Mở trình duyệt web và đi tới địa chỉ: `http://localhost:8000`
 
-Thành phần này đảm nhiệm việc tìm kiếm ngữ nghĩa.
+3. **Trải nghiệm:**
+   Gõ các câu hỏi pháp lý vào khung chat (ví dụ: *"Hành vi nào bị nghiêm cấm trên không gian mạng?"*) và nhận kết quả tư vấn!
 
-- Dữ liệu văn bản luật được chia nhỏ theo **Điều/Khoản**
-- Sử dụng embedding model: `all-MiniLM-L6-v2`
-- Lưu trữ trong MySQL (XAMPP)
+## 6. 🛠 Công nghệ dùng
 
-Vai trò:
-- Tìm các đoạn văn bản có nội dung liên quan
-- Cung cấp context ban đầu cho mô hình ngôn ngữ
-- Xử lý các truy vấn không khớp chính xác từ khóa
+| Thành phần | Công nghệ / Thư viện |
+|------------|-----------------------|
+| **Backend API** | FastAPI, Uvicorn ⚡ |
+| **Mô hình Ngôn ngữ (LLM)** | Google Gemini API (Gemini 2.5) 🤖 |
+| **Framework AI** | LangChain, Sentence-transformers |
+| **Cơ sở dữ liệu Đồ thị** | Neo4j 🕸️ |
+| **Cơ sở dữ liệu Vector** | FAISS / Qdrant 🗄️ |
 
----
-
-### Mô hình ngôn ngữ (LLM)
-
-Hệ thống sử dụng **Gemini 2.5 Flash** để tổng hợp thông tin và sinh câu trả lời.
-
-**Đầu vào:**
-- Context từ Vector Search
-- Thông tin quan hệ từ Knowledge Graph
-
-**Đầu ra:**
-- Câu trả lời có cấu trúc
-- Trích dẫn điều luật cụ thể
-- Lập luận dựa trên dữ liệu truy xuất
-
----
-
-## Cách hệ thống hoạt động (GraphRAG)
-
-Quy trình xử lý một câu hỏi diễn ra theo các bước:
-
-1. **Phân tích truy vấn**
-   - Xác định hành vi, chủ thể, loại văn bản liên quan
-
-2. **Truy xuất vector**
-   - Tìm các đoạn luật có độ tương đồng cao
-
-3. **Truy vấn đồ thị**
-   - Mở rộng thông tin qua các quan hệ như:
-     - Điều luật liên quan
-     - Hành vi bị cấm
-     - Văn bản nguồn
-
-4. **Hợp nhất ngữ cảnh**
-   - Loại bỏ trùng lặp
-   - Giữ lại thông tin có giá trị cao
-
-5. **Sinh câu trả lời**
-   - Dựa hoàn toàn vào dữ liệu truy xuất
-   - Kèm theo trích dẫn pháp lý
-
----
-
-## Pipeline dữ liệu
-
-Hệ thống có pipeline xử lý dữ liệu gồm hai phần chính:
-
-### 1. Xử lý và lưu trữ văn bản
-
-- Thu thập văn bản luật
-- Làm sạch và chuẩn hóa dữ liệu
-- Chia đoạn theo cấu trúc (Điều/Khoản)
-- Sinh embedding
-- Lưu vào MySQL
-
-### 2. Xây dựng Knowledge Graph
-
-- Trích xuất thực thể (NER)
-- Trích xuất quan hệ (Relation Extraction)
-- Chuyển dữ liệu sang Neo4j
-- Tạo nodes và relationships theo schema pháp lý
-
----
-
-## Thiết kế lưu trữ
-
-### MySQL
-Dùng để lưu:
-- Nội dung văn bản luật
-- Embedding vector
-- Metadata (điều, khoản, văn bản…)
-
-### Neo4j
-Dùng để lưu:
-- Quan hệ giữa các thành phần pháp luật
-- Cấu trúc phân cấp và dẫn chiếu
-
----
-
-## Điểm nổi bật
-
-- Kết hợp **Vector Search và Knowledge Graph**
-- Tôn trọng cấu trúc pháp lý (Điều/Khoản)
-- Câu trả lời có **trích dẫn rõ ràng**
-- Giảm thiểu hallucination
-- Dễ mở rộng thêm dữ liệu và luật mới
-
----
-
-## Công nghệ sử dụng
-
-| Thành phần | Công nghệ |
-|----------|----------|
-| Backend | Python (Flask) |
-| LLM | Gemini 2.5 Flash |
-| Embedding | sentence-transformers |
-| Database | MySQL (XAMPP) |
-| Graph DB | Neo4j |
-| Pipeline | Python scripts |
-
----
-
-## Phạm vi
-
-Hệ thống hiện tập trung vào:
-- Luật Công nghệ thông tin
-- Luật An ninh mạng
-- Các nghị định, thông tư liên quan
-
----
-
-## Hạn chế
-
-- Phụ thuộc vào dữ liệu đầu vào
-- Cần cập nhật khi có thay đổi pháp luật
-- Độ chính xác phụ thuộc vào mức độ đầy đủ của Knowledge Graph
-
----
-
-## Định hướng phát triển
-
-- Mở rộng sang các lĩnh vực luật khác
-- Tích hợp mô hình ngôn ngữ chuyên ngành pháp lý
-- Tối ưu truy vấn đồ thị (multi-hop reasoning)
-- Xây dựng hệ thống đánh giá tự động
-
----
+## 7. 👨‍💻 Thông tin tác giả
+- **Tác giả**: BaThanhHuynh (Huỳnh Bá Thành)
+- **GitHub**: [@BaThanhHuynh](https://github.com/BaThanhHuynh)
+- **Link dự án**: [IT-Law-Chatbot](https://github.com/BaThanhHuynh/IT-Law-Chatbot)
