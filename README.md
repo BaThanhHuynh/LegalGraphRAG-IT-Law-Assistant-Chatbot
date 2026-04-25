@@ -1,10 +1,10 @@
 # IT Law Chatbot - Trợ lý pháp lý thông minh
 
 ## 1. Tên và mô tả
-**IT Law Chatbot** là một hệ thống trợ lý ảo chuyên tư vấn pháp lý về lĩnh vực Công nghệ thông tin tại Việt Nam. Bằng cách ứng dụng kiến trúc tiên tiến **GraphRAG** (kết hợp Đồ thị tri thức - Knowledge Graph và Tìm kiếm Vector), chatbot có khả năng cung cấp các câu trả lời chính xác, bám sát văn bản pháp luật, đồng thời luôn đi kèm trích dẫn rõ ràng, minh bạch.
+**IT Law Chatbot** là một trợ lý AI chuyên tư vấn pháp lý, luật về lĩnh vực Công nghệ thông tin tại Việt Nam. Bằng cách ứng dụng kiến trúc tiên tiến **GraphRAG** (kết hợp Đồ thị tri thức - Knowledge Graph và Tìm kiếm Vector), chatbot có khả năng cung cấp các câu trả lời chính xác, bám sát văn bản pháp luật, đồng thời luôn đi kèm trích dẫn rõ ràng, minh bạch.
 
 ## 2. Tính năng chính
-- **Tra cứu thông minh**: Hiểu ngôn ngữ tự nhiên và truy xuất cực nhanh các điều khoản luật liên quan.
+- **Tra cứu thông minh**: Hiểu ngôn ngữ tự nhiên và truy xuất các điều khoản luật liên quan.
 - **Suy luận chuyên sâu (GraphRAG)**: Phân tích được các mối liên hệ phức tạp giữa văn bản luật, chương, điều khoản, hành vi và chủ thể.
 - **Trả lời tự nhiên, logic**: Tích hợp mô hình AI mạnh mẽ (Gemini 2.5 Flash) giúp phản hồi trôi chảy, dễ hiểu.
 - **Trích dẫn nguồn uy tín**: Không tự bịa thông tin, luôn cung cấp căn cứ pháp lý để người dùng đối chiếu.
