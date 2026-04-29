@@ -18,7 +18,7 @@ def get_llm():
     global _model
     if _model is None:
         genai.configure(api_key=Config.GEMINI_API_KEY)
-        _model = genai.GenerativeModel("gemini-2.0-flash")
+        _model = genai.GenerativeModel("gemini-3.1-flash-lite-preview")
         logger.info("[LLM] Gemini model initialized.")
     return _model
 
@@ -98,7 +98,7 @@ def generate_response(query: str, conversation_id: str = None) -> dict:
             answer = response.text
     except Exception as e:
         logger.error(f"[Error] LLM generation failed: {e}")
-        answer = f"Hệ thống đã truy xuất được dữ liệu nhưng API Gemini bị lỗi (có thể hết Quota). Đây là dữ liệu gốc:\n\n{rag_context}"
+        answer = f"Lỗi API key Gemini"
 
     # 7. Build sources list
     sources = []
